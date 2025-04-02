@@ -1,0 +1,123 @@
+import axios from "axios";
+import { analyzeSentiment, calculateEngagementScore } from "../Utils/Utilities";
+import TrendingRedditPost from "../Models/Reddit";
+
+const fetchTrendingRedditPosts = async (subreddit = "all") => {
+  const redditCategories = {
+    popular: "hot",
+    upVoted: "top",
+    recent: "new",
+    trending: "rising",
+    controversial: "controversial",
+    global: "top",
+  };
+
+  for (const [type, endPoint] of Object.entries(redditCategories)) {
+    try {
+      const url = `https://www.reddit.com/r/${subreddit}/${endPoint}.json?limit=5`;
+
+      const response = await axios.get(url);
+
+      const posts = response.data.data.children;
+      if (!posts || posts.length === 0) {
+        console.log(`No ${type} posts found for subreddit: ${subreddit}`);
+        continue;
+      }
+      for (const post of posts) {
+        const postData = post.data;
+
+
+
+        const engagementScore = calculateEngagementScore(
+          postData.ups || 0,
+          postData.num_comments || 0,
+          postData.subreddit_subscribers || 1
+        );
+
+        const newPost = {
+          postId: postData.id,
+          author: postData.author,
+          title: postData.title,
+          subreddit: postData.subreddit,
+          subRedditSubscribers: postData.subreddit_subscribers,
+          url: `https://www.reddit.com/media?url=${postData.url}`,
+          postUrl: `https://www.reddit.com${postData.permalink}`,
+          postPublishedAt: new Date(postData.created_utc * 1000),
+          isVideo: postData.is_video,
+          ups: postData.ups || 0,
+          downVotes: postData.downs,
+          upVoteRatio: postData.upvote_ratio,
+          numOfComments: postData.num_comments,
+          score: postData.score,
+          sentiment: analyzeSentiment(postData.title),
+          engagementScore,
+          fetchedAt: new Date(),
+          region: "global",
+          postTrendingType: type,
+        };
+
+        // Save the post to the database
+        console.table(newPost)
+       await TrendingRedditPost.findOneAndUpdate(
+          { postId: postData.id },
+          newPost,
+          { upsert: true, new: true }
+        );
+      }
+
+  
+
+      console.log(`Fetched ${posts.length} ${type} posts from Reddit`);
+    } catch (error) {
+      console.error(`Error fetching ${type} posts from Reddit:`, error);
+      return null;
+    }
+  }
+};
+
+
+
+
+
+
+for (const post of posts) {
+    const postData = post.data;
+
+
+
+    const engagementScore = calculateEngagementScore(
+      postData.ups || 0,
+      postData.num_comments || 0,
+      postData.subreddit_subscribers || 1
+    );
+
+    const newPost = {
+      postId: postData.id,
+      author: postData.author,
+      title: postData.title,
+      subreddit: postData.subreddit,
+      subRedditSubscribers: postData.subreddit_subscribers,
+      url: `https://www.reddit.com/media?url=${postData.url}`,
+      postUrl: `https://www.reddit.com${postData.permalink}`,
+      postPublishedAt: new Date(postData.created_utc * 1000),
+      isVideo: postData.is_video,
+      ups: postData.ups || 0,
+      downVotes: postData.downs,
+      upVoteRatio: postData.upvote_ratio,
+      numOfComments: postData.num_comments,
+      score: postData.score,
+      sentiment: analyzeSentiment(postData.title),
+      engagementScore,
+      fetchedAt: new Date(),
+      region: "global",
+      postTrendingType: type,
+    };
+
+    // Save the post to the database
+    console.table(newPost)
+   await TrendingRedditPost.findOneAndUpdate(
+      { postId: postData.id },
+      newPost,
+      { upsert: true, new: true }
+    );
+  }

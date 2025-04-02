@@ -1,0 +1,29 @@
+{
+  "name": "viral-content-analyzer-saas",
+  "version": "1.0.0",
+  "description": "A web app that searches and shows users trending topics on YouTube, Twitter, Instagram, Reddit, and other platforms",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "author": "Developer Sagar",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.8.4",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "discord.js": "^14.18.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.0",
+    "natural": "^8.0.1",
+    "node-cron": "^3.0.3",
+    "sentiment": "^5.0.2",
+    "stopword": "^3.1.4"
+  }
+}
